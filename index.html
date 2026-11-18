@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#6b55dc">
+    <title>Taskflow | Gestión de tareas</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="app.js" defer></script>
+</head>
+<body>
+    <main id="authView" class="auth-page">
+        <section class="auth-card" aria-labelledby="authTitle">
+            <a class="brand" href="#" aria-label="Taskflow, inicio">
+                <span class="brand-mark" aria-hidden="true">T</span>
+                <span>taskflow</span>
+            </a>
+            <p class="eyebrow">ORGANIZA TU DÍA</p>
+            <h1 id="authTitle">Tus tareas, bajo control.</h1>
+            <p class="muted auth-copy">Inicia sesión o crea una cuenta para organizar tus pendientes.</p>
+
+            <div class="auth-tabs" role="tablist" aria-label="Acceso">
+                <button class="auth-tab is-active" id="loginTab" type="button" role="tab" aria-selected="true">Iniciar sesión</button>
+                <button class="auth-tab" id="registerTab" type="button" role="tab" aria-selected="false">Crear cuenta</button>
+            </div>
+
+            <form id="authForm" novalidate>
+                <label class="field-label" for="authUsername">Nombre de usuario</label>
+                <input id="authUsername" name="username" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" minlength="3" maxlength="20" pattern="[A-Za-z0-9._\x2D]{3,20}" title="Usa de 3 a 20 caracteres: letras, números, punto, guion o guion bajo." placeholder="Ej. julia_qa" required>
+                <p class="field-help">3–20 caracteres: letras, números, punto, guion (-) y guion bajo (_).</p>
+
+                <label class="field-label" for="authPassword">Contraseña</label>
+                <input id="authPassword" name="password" type="password" autocomplete="current-password" placeholder="Crea una contraseña segura" minlength="11" pattern="[A-Za-z0-9._@\x2D]+" title="Usa solo letras, números y los símbolos punto, guion, guion bajo o arroba." required>
+                <p class="field-help">Mínimo: 8 letras, 2 números y 1 símbolo (., _, - o @).</p>
+
+                <div id="confirmPasswordField" class="hidden">
+                    <label class="field-label" for="confirmPassword">Confirmar contraseña</label>
+                    <input id="confirmPassword" name="confirmPassword" type="password" autocomplete="new-password" placeholder="Repite tu contraseña" minlength="11" pattern="[A-Za-z0-9._@\x2D]+">
+                </div>
+
+                <p id="authMessage" class="form-message" role="alert"></p>
+                <button id="authSubmit" class="button button-primary button-full" type="submit">Entrar</button>
+            </form>
+            <p class="demo-note">Proyecto de demostración: los datos se guardan en este navegador.</p>
+        </section>
+    </main>
+
+    <div id="appView" class="app-shell hidden">
+        <header class="topbar">
+            <a class="brand" href="#" aria-label="Taskflow, inicio">
+                <span class="brand-mark" aria-hidden="true">T</span>
+                <span>taskflow</span>
+            </a>
+            <div class="topbar-user">
+                <span id="userHandle" class="user-handle"></span>
+                <button id="logoutButton" class="button button-quiet" type="button">Cerrar sesión</button>
+            </div>
+        </header>
+
+        <main class="dashboard">
+            <section class="welcome-row">
+                <div>
+                    <p class="eyebrow">TU ESPACIO DE TRABAJO</p>
+                    <h1>Hola, <span id="userName">¡bienvenida!</span></h1>
+                    <p class="muted">Un paso a la vez. Esto es lo que tienes en marcha.</p>
+                </div>
+                <button id="newTaskButton" class="button button-primary" type="button">
+                    <span aria-hidden="true">+</span> Nueva tarea
+                </button>
+            </section>
+
+            <section class="stats-grid" aria-label="Resumen de tareas">
+                <article class="stat-card">
+                    <span class="stat-icon stat-icon-purple" aria-hidden="true">▤</span>
+                    <div><p>Total de tareas</p><strong id="totalCount">0</strong></div>
+                </article>
+                <article class="stat-card">
+                    <span class="stat-icon stat-icon-blue" aria-hidden="true">◷</span>
+                    <div><p>En progreso</p><strong id="activeCount">0</strong></div>
+                </article>
+                <article class="stat-card">
+                    <span class="stat-icon stat-icon-green" aria-hidden="true">✓</span>
+                    <div><p>Completadas</p><strong id="completedCount">0</strong></div>
+                </article>
+                <article class="stat-card">
+                    <span class="stat-icon stat-icon-orange" aria-hidden="true">!</span>
+                    <div><p>Vencidas</p><strong id="overdueCount">0</strong></div>
+                </article>
+            </section>
+
+            <section class="tasks-panel" aria-labelledby="tasksTitle">
+                <div class="panel-heading">
+                    <div>
+                        <h2 id="tasksTitle">Mis tareas</h2>
+                        <p class="muted">Administra tus pendientes y prioridades.</p>
+                    </div>
+                </div>
+                <div class="task-filters">
+                    <label class="search-field">
+                        <span class="visually-hidden">Buscar tareas</span>
+                        <span aria-hidden="true">⌕</span>
+                        <input id="searchInput" type="search" placeholder="Buscar tareas...">
+                    </label>
+                    <label class="visually-hidden" for="statusFilter">Filtrar por estado</label>
+                    <select id="statusFilter" class="filter-select">
+                        <option value="all">Todos los estados</option>
+                        <option value="pending">Pendiente</option>
+                        <option value="in-progress">En progreso</option>
+                        <option value="completed">Completada</option>
+                    </select>
+                </div>
+                <div id="taskList" class="task-list" aria-live="polite"></div>
+            </section>
+        </main>
+    </div>
+
+    <dialog id="taskDialog" class="task-dialog">
+        <form id="taskForm" class="task-form">
+            <div class="dialog-heading">
+                <div>
+                    <p class="eyebrow">DETALLES DE LA TAREA</p>
+                    <h2 id="dialogTitle">Nueva tarea</h2>
+                </div>
+                <button id="closeDialogButton" class="icon-button" type="button" aria-label="Cerrar">×</button>
+            </div>
+            <input id="taskId" type="hidden">
+
+            <label class="field-label" for="taskTitle">Título</label>
+            <input id="taskTitle" name="title" type="text" maxlength="100" placeholder="Ej. Preparar casos de prueba" required>
+
+            <label class="field-label" for="taskDescription">Descripción <span class="optional-label">(opcional)</span></label>
+            <textarea id="taskDescription" name="description" rows="3" maxlength="500" placeholder="Agrega algunos detalles..."></textarea>
+
+            <div class="form-row">
+                <div>
+                    <label class="field-label" for="taskStatus">Estado</label>
+                    <select id="taskStatus" name="status">
+                        <option value="pending">Pendiente</option>
+                        <option value="in-progress">En progreso</option>
+                        <option value="completed">Completada</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="field-label" for="taskPriority">Prioridad</label>
+                    <select id="taskPriority" name="priority">
+                        <option value="low">Baja</option>
+                        <option value="medium" selected>Media</option>
+                        <option value="high">Alta</option>
+                    </select>
+                </div>
+            </div>
+
+            <label class="field-label" for="taskDueDate">Fecha límite <span class="optional-label">(opcional)</span></label>
+            <input id="taskDueDate" name="dueDate" type="date">
+            <p id="taskMessage" class="form-message" role="alert"></p>
+            <div class="dialog-actions">
+                <button id="cancelTaskButton" class="button button-secondary" type="button">Cancelar</button>
+                <button class="button button-primary" type="submit">Guardar tarea</button>
+            </div>
+        </form>
+    </dialog>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
