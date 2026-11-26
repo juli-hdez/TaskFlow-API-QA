@@ -25,16 +25,16 @@
             </div>
 
             <form id="authForm" novalidate>
-                <label class="field-label" for="authUsername">Nombre de usuario</label>
+                <label class="field-label" for="authUsername">Nombre de usuario <span class="required-label">(obligatorio)</span></label>
                 <input id="authUsername" name="username" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" minlength="3" maxlength="20" pattern="[A-Za-z0-9._\x2D]{3,20}" title="Usa de 3 a 20 caracteres: letras, números, punto, guion o guion bajo." placeholder="Ej. julia_qa" required>
-                <p class="field-help">3–20 caracteres: letras, números, punto, guion (-) y guion bajo (_).</p>
+                <p class="field-help auth-register-help hidden">3–20 caracteres: letras, números, punto, guion (-) y guion bajo (_).</p>
 
-                <label class="field-label" for="authPassword">Contraseña</label>
+                <label class="field-label" for="authPassword">Contraseña <span class="required-label">(obligatorio)</span></label>
                 <input id="authPassword" name="password" type="password" autocomplete="current-password" placeholder="Crea una contraseña segura" minlength="11" pattern="[A-Za-z0-9._@\x2D]+" title="Usa solo letras, números y los símbolos punto, guion, guion bajo o arroba." required>
-                <p class="field-help">Mínimo: 8 letras, 2 números y 1 símbolo (., _, - o @).</p>
+                <p class="field-help auth-register-help hidden">Mínimo: 8 letras, 2 números y 1 símbolo (., _, - o @).</p>
 
                 <div id="confirmPasswordField" class="hidden">
-                    <label class="field-label" for="confirmPassword">Confirmar contraseña</label>
+                    <label class="field-label" for="confirmPassword">Confirmar contraseña <span class="required-label">(obligatorio)</span></label>
                     <input id="confirmPassword" name="confirmPassword" type="password" autocomplete="new-password" placeholder="Repite tu contraseña" minlength="11" pattern="[A-Za-z0-9._@\x2D]+">
                 </div>
 
@@ -125,7 +125,7 @@
             </div>
             <input id="taskId" type="hidden">
 
-            <label class="field-label" for="taskTitle">Título</label>
+            <label class="field-label" for="taskTitle">Título <span class="required-label">(obligatorio)</span></label>
             <input id="taskTitle" name="title" type="text" maxlength="100" placeholder="Ej. Preparar casos de prueba" required>
             <p class="field-help">Hasta 100 caracteres: letras latinas, espacios, comas, puntos y punto y coma.</p>
 
@@ -135,16 +135,16 @@
 
             <div class="form-row">
                 <div>
-                    <label class="field-label" for="taskStatus">Estado</label>
-                    <select id="taskStatus" name="status">
+                    <label class="field-label" for="taskStatus">Estado <span class="required-label">(obligatorio)</span></label>
+                    <select id="taskStatus" name="status" required>
                         <option value="pending">Pendiente</option>
                         <option value="in-progress">En progreso</option>
                         <option value="completed">Completada</option>
                     </select>
                 </div>
                 <div>
-                    <label class="field-label" for="taskPriority">Prioridad</label>
-                    <select id="taskPriority" name="priority">
+                    <label class="field-label" for="taskPriority">Prioridad <span class="required-label">(obligatorio)</span></label>
+                    <select id="taskPriority" name="priority" required>
                         <option value="low">Baja</option>
                         <option value="medium" selected>Media</option>
                         <option value="high">Alta</option>

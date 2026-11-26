@@ -7,6 +7,7 @@ const appView = document.querySelector("#appView");
 const authForm = document.querySelector("#authForm");
 const authUsername = document.querySelector("#authUsername");
 const authPassword = document.querySelector("#authPassword");
+const authRegisterHelp = document.querySelectorAll(".auth-register-help");
 const confirmPassword = document.querySelector("#confirmPassword");
 const confirmPasswordField = document.querySelector("#confirmPasswordField");
 const authMessage = document.querySelector("#authMessage");
@@ -118,6 +119,7 @@ function setAuthMode(mode) {
     loginTab.setAttribute("aria-selected", String(!isRegistering));
     registerTab.setAttribute("aria-selected", String(isRegistering));
     confirmPasswordField.classList.toggle("hidden", !isRegistering);
+    authRegisterHelp.forEach((help) => help.classList.toggle("hidden", !isRegistering));
     confirmPassword.required = isRegistering;
     authPassword.autocomplete = isRegistering ? "new-password" : "current-password";
     authSubmit.textContent = isRegistering ? "Crear cuenta" : "Entrar";
@@ -392,7 +394,7 @@ taskForm.addEventListener("submit", (event) => {
     event.preventDefault();
     taskMessage.textContent = "";
 
-    const title = document.querySelector("#taskTitle").value.trim().normalize("NFC");
+    const title = taskTitleInput.value.trim().normalize("NFC");
     if (!title) {
         taskMessage.textContent = "Escribe un título para la tarea.";
         return;
@@ -401,7 +403,7 @@ taskForm.addEventListener("submit", (event) => {
     const tasks = readTasks();
     const taskId = document.querySelector("#taskId").value;
     const existingTask = tasks.find((task) => task.id === taskId);
-    const description = document.querySelector("#taskDescription").value.trim().normalize("NFC");
+    const description = taskDescriptionInput.value.trim().normalize("NFC");
     if (title.length > 100 || !taskTextPattern.test(title)) {
         taskMessage.textContent = "El título solo puede contener hasta 100 caracteres: letras latinas, espacios, comas, puntos y punto y coma.";
         return;
@@ -411,12 +413,13 @@ taskForm.addEventListener("submit", (event) => {
         return;
     }
 
-    const dueDate = document.querySelector("#taskDueDate").value;
+    const dueDate = taskDueDateInput.value;
     const earliestDueDate = existingTask ? taskCreationDate(existingTask) : localDateString();
     if (dueDate && dueDate < earliestDueDate) {
         taskMessage.textContent = "La fecha límite debe ser igual o posterior a la fecha de creación de la tarea.";
         return;
     }
+
     const task = {
         id: taskId || (window.crypto.randomUUID ? window.crypto.randomUUID() : `${Date.now()}-${Math.random()}`),
         title,
