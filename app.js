@@ -16,6 +16,9 @@ const registerTab = document.querySelector("#registerTab");
 const taskDialog = document.querySelector("#taskDialog");
 const taskForm = document.querySelector("#taskForm");
 const taskMessage = document.querySelector("#taskMessage");
+const taskTitleInput = document.querySelector("#taskTitle");
+const taskDescriptionInput = document.querySelector("#taskDescription");
+const taskDueDateInput = document.querySelector("#taskDueDate");
 const taskList = document.querySelector("#taskList");
 const searchInput = document.querySelector("#searchInput");
 const statusFilter = document.querySelector("#statusFilter");
@@ -24,6 +27,8 @@ const toast = document.querySelector("#toast");
 let authMode = "login";
 let currentUser = "";
 let toastTimeout;
+
+const taskTextPattern = /^[\p{Script=Latin} ,;.]*$/u;
 
 const statusLabels = {
     pending: "Pendiente",
@@ -161,6 +166,18 @@ function formatDueDate(date) {
     });
 }
 
+function localDateString(date = new Date()) {
+    return [
+        date.getFullYear(),
+        String(date.getMonth() + 1).padStart(2, "0"),
+        String(date.getDate()).padStart(2, "0")
+    ].join("-");
+}
+
+function taskCreationDate(task) {
+    return localDateString(new Date(task.createdAt));
+}
+
 function isOverdue(task) {
     if (!task.dueDate || task.status === "completed") {
         return false;
@@ -282,13 +299,14 @@ function renderTasks() {
 function openTaskDialog(task) {
     taskForm.reset();
     taskMessage.textContent = "";
+    taskDueDateInput.min = task ? taskCreationDate(task) : localDateString();
     document.querySelector("#taskId").value = task ? task.id : "";
     document.querySelector("#dialogTitle").textContent = task ? "Editar tarea" : "Nueva tarea";
-    document.querySelector("#taskTitle").value = task ? task.title : "";
-    document.querySelector("#taskDescription").value = task ? task.description : "";
+    taskTitleInput.value = task ? task.title : "";
+    taskDescriptionInput.value = task ? task.description : "";
     document.querySelector("#taskStatus").value = task ? task.status : "pending";
     document.querySelector("#taskPriority").value = task ? task.priority : "medium";
-    document.querySelector("#taskDueDate").value = task ? task.dueDate : "";
+    taskDueDateInput.value = task ? task.dueDate : "";
     taskDialog.showModal();
     document.querySelector("#taskTitle").focus();
 }
@@ -374,7 +392,7 @@ taskForm.addEventListener("submit", (event) => {
     event.preventDefault();
     taskMessage.textContent = "";
 
-    const title = document.querySelector("#taskTitle").value.trim();
+    const title = document.querySelector("#taskTitle").value.trim().normalize("NFC");
     if (!title) {
         taskMessage.textContent = "Escribe un título para la tarea.";
         return;
@@ -383,13 +401,29 @@ taskForm.addEventListener("submit", (event) => {
     const tasks = readTasks();
     const taskId = document.querySelector("#taskId").value;
     const existingTask = tasks.find((task) => task.id === taskId);
+    const description = document.querySelector("#taskDescription").value.trim().normalize("NFC");
+    if (title.length > 100 || !taskTextPattern.test(title)) {
+        taskMessage.textContent = "El título solo puede contener hasta 100 caracteres: letras latinas, espacios, comas, puntos y punto y coma.";
+        return;
+    }
+    if (description.length > 500 || !taskTextPattern.test(description)) {
+        taskMessage.textContent = "La descripción solo puede contener hasta 500 caracteres: letras latinas, espacios, comas, puntos y punto y coma.";
+        return;
+    }
+
+    const dueDate = document.querySelector("#taskDueDate").value;
+    const earliestDueDate = existingTask ? taskCreationDate(existingTask) : localDateString();
+    if (dueDate && dueDate < earliestDueDate) {
+        taskMessage.textContent = "La fecha límite debe ser igual o posterior a la fecha de creación de la tarea.";
+        return;
+    }
     const task = {
         id: taskId || (window.crypto.randomUUID ? window.crypto.randomUUID() : `${Date.now()}-${Math.random()}`),
         title,
-        description: document.querySelector("#taskDescription").value.trim(),
+        description,
         status: document.querySelector("#taskStatus").value,
         priority: document.querySelector("#taskPriority").value,
-        dueDate: document.querySelector("#taskDueDate").value,
+        dueDate,
         createdAt: existingTask ? existingTask.createdAt : new Date().toISOString()
     };
 

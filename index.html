@@ -127,9 +127,11 @@
 
             <label class="field-label" for="taskTitle">Título</label>
             <input id="taskTitle" name="title" type="text" maxlength="100" placeholder="Ej. Preparar casos de prueba" required>
+            <p class="field-help">Hasta 100 caracteres: letras latinas, espacios, comas, puntos y punto y coma.</p>
 
             <label class="field-label" for="taskDescription">Descripción <span class="optional-label">(opcional)</span></label>
             <textarea id="taskDescription" name="description" rows="3" maxlength="500" placeholder="Agrega algunos detalles..."></textarea>
+            <p class="field-help">Hasta 500 caracteres: letras latinas, espacios, comas, puntos y punto y coma.</p>
 
             <div class="form-row">
                 <div>
@@ -151,7 +153,8 @@
             </div>
 
             <label class="field-label" for="taskDueDate">Fecha límite <span class="optional-label">(opcional)</span></label>
-            <input id="taskDueDate" name="dueDate" type="date">
+            <input id="taskDueDate" name="dueDate" type="date" inputmode="numeric">
+            <p class="field-help">Debe ser igual o posterior a la fecha de creación.</p>
             <p id="taskMessage" class="form-message" role="alert"></p>
             <div class="dialog-actions">
                 <button id="cancelTaskButton" class="button button-secondary" type="button">Cancelar</button>
